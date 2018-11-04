@@ -1,0 +1,42 @@
+{
+  "variables": {
+    "aws_subnet_id": "",
+    "playbook": "base"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "name": "es-base",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "amzn2-ami-hvm-2.0*",
+          "root-device-type": "ebs"
+        },
+        "owners": [
+          "137112412989"
+        ],
+        "most_recent": "true"
+      },
+      "ami_name": "es-demo/base",
+      "subnet_id": "{{ user `aws_subnet_id` }}",
+      "ena_support": "true",
+      "sriov_support": "true",
+      "encrypt_boot": "false",
+      "ssh_username": "ec2-user",
+      "instance_type": "t3.micro"
+    }
+   ],
+   "provisioners": [
+     {
+       "type": "ansible",
+       "user": "ec2-user",
+       "playbook_file": "../ansible/plays/{{ user `playbook` }}.yml",
+       "ansible_env_vars": [
+         "ANSIBLE_NOCOLOR=1",
+         "ANSIBLE_HOST_KEY_CHECKING=False",
+         "ANSIBLE_SSH_ARGS='-o ForwardAgent=yes -o ControlMaster=auto -o ControlPersist=60s'"
+       ]
+     }
+   ]
+}

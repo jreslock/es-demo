@@ -1,0 +1,46 @@
+---
+- hosts: all
+  become: yes
+  become_method: sudo
+
+  tasks:
+    - name: Update all packages
+      package:
+        name: '*'
+        state: latest
+        update_cache: yes
+
+    - name: Install JDK and ElasticSearch
+      yum:
+        name: [
+        'java-1.8.0-openjdk-devel',
+        'https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.4.2.rpm'
+        ]
+        state: installed
+
+    - name: Install discovery-ec2 plugin
+      shell: yes | ./elasticsearch-plugin install discovery-ec2 -s
+      args:
+        chdir: /usr/share/elasticsearch/bin
+
+    - name: Copy elasticsearch.yml
+      copy:
+        src: ../files/elasticsearch.yml
+        dest: /etc/elasticsearch/elasticsearch.yml
+
+    - name: Create override dir
+      file:
+        path: /etc/systemd/system/elasticsearch.service.d
+        state: directory
+        mode: 0755
+
+    - name: Copy systemd override
+      copy:
+        src: ../files/override.conf
+        dest: /etc/systemd/system/elasticsearch.service.d/override.conf
+
+    - name: Enable ES Service
+      systemd:
+        name: elasticsearch
+        enabled: yes
+        daemon_reload: yes
