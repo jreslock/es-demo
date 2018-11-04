@@ -69,7 +69,7 @@ resource "aws_security_group" "asg" {
 
 resource "aws_launch_configuration" "es-cluster" {
   image_id             = "${var.es_ami}"
-  instance_type        = "m3.medium"
+  instance_type        = "m4.large"
   iam_instance_profile = "${module.iam.es_demo_instance_profile}"
   key_name             = "${aws_key_pair.ssh.key_name}"
   security_groups      = ["${aws_security_group.asg.id}"]
@@ -101,7 +101,7 @@ resource "aws_lb_target_group" "es-target-group" {
 
   health_check {
     interval            = "30"
-    path                = "/_cat/health?v"
+    path                = "/"
     port                = "9200"
     protocol            = "HTTP"
     timeout             = "3"
