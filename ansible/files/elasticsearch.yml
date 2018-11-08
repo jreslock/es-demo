@@ -6,3 +6,17 @@ cloud.node.auto_attributes: true
 cluster.routing.allocation.awareness.attributes: aws_availability_zone
 path.data: /var/lib/elasticsearch
 path.logs: /var/log/elasticsearch
+xpack.security.enabled: true
+xpack.security.audit.enabled: true
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.verification_mode: certificate
+xpack.security.transport.ssl.keystore.path: /etc/elasticsearch/certs/es-demo-node.p12
+xpack.security.transport.ssl.truststore.path: /etc/elasticsearch/certs/es-demo-node.p12
+
+xpack:
+  security:
+    authc:
+      realms:
+        file1:
+          type: file
+          order: 0

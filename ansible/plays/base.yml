@@ -28,6 +28,36 @@
         src: ../files/elasticsearch.yml
         dest: /etc/elasticsearch/elasticsearch.yml
 
+    - name: Create certs directory
+      file:
+        path: /etc/elasticsearch/certs
+        state: directory
+
+    - name: Create CA cert
+      shell: ./elasticsearch-certutil ca --pass insecure --out /etc/elasticsearch/certs/es-demo-ca.p12
+      args:
+        chdir: /usr/share/elasticsearch/bin
+
+    - name: Create node cert
+      shell: ./elasticsearch-certutil cert -ca /etc/elasticsearch/certs/es-demo-ca.p12 --ca-pass insecure --pass "" --out /etc/elasticsearch/certs/es-demo-node.p12
+      args:
+        chdir: /usr/share/elasticsearch/bin
+
+    - name: Set cert ownership
+      file:
+        path: /etc/elasticsearch/certs/es-demo-ca.p12
+        mode: 0744
+
+    - name: Set cert ownership
+      file:
+        path: /etc/elasticsearch/certs/es-demo-node.p12
+        mode: 0744
+
+    - name: Create demo user
+      shell: ./elasticsearch-users useradd demo -p demopass -r superuser
+      args:
+        chdir: /usr/share/elasticsearch/bin
+
     - name: Create override dir
       file:
         path: /etc/systemd/system/elasticsearch.service.d
